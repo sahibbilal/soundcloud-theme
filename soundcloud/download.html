@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SoundCloud Downloader</title>
+  <style>
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  color: #eee;
+  margin: 0;
+  padding: 15px;
+}
+
+.container {
+  max-width: 60%;
+  margin: auto;
+  word-wrap: break-word;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffa500;
+  font-size: clamp(20px, 5vw, 36px);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.input-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #f60;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #d55000;
+}
+
+#playlistInfo {
+  display: none;
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+#playlistInfo img {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #333;
+  flex-shrink: 0;
+}
+
+#playlistDetails {
+  flex: 1;
+  min-width: 200px;
+}
+
+#playlistDetails h2 {
+  margin: 0 0 5px 0;
+  font-size: clamp(16px, 4vw, 24px);
+  color: #ffa500;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+
+#playlistDetails p {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #bbb;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #222;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.track img {
+  width: 65px;
+  height: 65px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #333;
+  flex-shrink: 0;
+}
+
+.track-info {
+  flex: 1;
+  overflow: hidden;
+  min-width: 200px;
+}
+
+.track-title {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: normal; /* instead of nowrap */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+
+.track-artist {
+  font-size: 13px;
+  color: #bbb;
+}
+
+.track-meta {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 6px;
+  word-wrap: break-word;
+}
+
+.track-meta a {
+  color: #ffa500;
+  text-decoration: none;
+}
+
+.track-meta a:hover {
+  text-decoration: underline;
+}
+
+.download-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 140px;
+  text-align: center;
+}
+
+.download-btn:hover {
+  background-color: #218838;
+}
+
+.control-buttons {
+  display: none;
+  /*flex-wrap: wrap;*/
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.control-buttons button {
+  flex: 1 1 45%;
+  min-width: 150px;
+}
+
+.control-buttons button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+a.small-link {
+  color: #bbb;
+  font-size: 12px;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+/* 📱 Mobile Optimization */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    padding: 10px;
+    word-wrap: break-word;
+  }
+
+  .control-buttons {
+    display: none;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .input-section {
+    flex-direction: column;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 15px;
+  }
+
+  #playlistInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .track {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .track img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .download-btn {
+    width: 100%;
+    max-width: none;
+  }
+
+  .control-buttons button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 SoundCloud Downloader</h1>
+
+    <div class="input-section">
+      <input type="text" id="urlInput" placeholder="Enter SoundCloud playlist or track URL" />
+      <button id="fetchBtn">Download</button>
+    </div>
+
+    <div id="playlistInfo">
+      <img id="playlistArtwork" src="" alt="Artwork" />
+      <div id="playlistDetails">
+        <h2 id="playlistTitle"></h2>
+        <p id="playlistAuthor"></p>
+        <p id="playlistCount"></p>
+      </div>
+    </div>
+
+    <div class="control-buttons" id="controlButtons">
+      <button id="downloadAllBtn" disabled style="display:none;">⬇️ Download Full Playlist (Zip File)</button>
+      <button id="downloadAllIndividuallyBtn" style="background-color: #0078d7 !important;">⬇️ Download Playlist </button>
+      <button id="downloadCoverBtn" disabled>🎨 Download Cover Image</button>
+      <button id="downloadProfileBtn" disabled>👤 Download Profile Picture</button>
+      <button id="resetBtn">🔄 Download More</button>
+    </div>
+
+    <div id="tracks"></div>
+  </div>
+
+  <script>
+    function formatDuration(seconds) {
+      if (!seconds && seconds !== 0) return "0:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    const fetchBtn = document.getElementById("fetchBtn");
+    const urlInput = document.getElementById("urlInput");
+    const tracksDiv = document.getElementById("tracks");
+    const playlistInfo = document.getElementById("playlistInfo");
+    const playlistTitle = document.getElementById("playlistTitle");
+    const playlistAuthor = document.getElementById("playlistAuthor");
+    const playlistCount = document.getElementById("playlistCount");
+    const playlistArtwork = document.getElementById("playlistArtwork");
+    const downloadAllBtn = document.getElementById("downloadAllBtn");
+    const downloadAllIndividuallyBtn = document.getElementById("downloadAllIndividuallyBtn");
+    const downloadCoverBtn = document.getElementById("downloadCoverBtn");
+    const downloadProfileBtn = document.getElementById("downloadProfileBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const controlButtons = document.getElementById("controlButtons");
+    const fallbackImg = "https://cdn.vectorstock.com/i/500p/32/78/soundcloud-social-media-icon-symbol-logo-vector-42863278.jpg";
+    let playlistData = null;
+
+    // get all data from link
+    fetchBtn.addEventListener("click", async () => {
+      const url = urlInput.value.trim();
+      if (!url) return alert("Please enter a SoundCloud URL");
+
+      tracksDiv.innerHTML = "<p>⏳ Fetching tracks...</p>";
+      playlistInfo.style.display = "none";
+      controlButtons.style.display = "none";
+
+      try {
+        const response = await fetch("main-download.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+        const data = await response.json();
+        console.log("data --->> ", data);
+
+        if (!data.tracks || data.tracks.length === 0) {
+          tracksDiv.innerHTML = "<p>❌ No tracks found.</p>";
+          return;
+        }
+
+        playlistData = data;
+        tracksDiv.innerHTML = "";
+        playlistInfo.style.display = "flex";
+        controlButtons.style.display = "flex";
+        downloadAllBtn.disabled = (data.tracks.length <= 1);
+        downloadCoverBtn.disabled = !data.artwork;
+        downloadProfileBtn.disabled = !data.profilePic;
+        playlistTitle.textContent = data.title || "Untitled Playlist";
+        playlistAuthor.textContent = data.author ? `👤 ${data.author}` : "";
+        playlistCount.textContent = `🎶 ${data.trackCount || data.tracks.length} tracks`;
+        playlistArtwork.src = data.artwork || fallbackImg;
+        playlistArtwork.onerror = () => (playlistArtwork.src = fallbackImg);
+
+        if (data?.genre) {
+          const genreLink = document.createElement("a");
+          genreLink.id = "playlistGenre";
+          genreLink.href = `https://soundcloud.com/tags/${encodeURIComponent(data.genre)}`;
+          genreLink.target = "_blank";
+          genreLink.textContent = `#${data.genre}`;
+          genreLink.style.color = "#00bfff";
+          genreLink.style.textDecoration = "none";
+          genreLink.style.marginTop = "5px";
+          genreLink.style.display = "inline-block";
+          playlistDetails.appendChild(genreLink);
+        }
+
+        data.tracks.forEach((track) => {
+          const trackDiv = document.createElement("div");
+          trackDiv.className = "track";
+
+          const img = document.createElement("img");
+          img.src = track.artwork || fallbackImg;
+          img.onerror = () => (img.src = fallbackImg);
+
+          const infoDiv = document.createElement("div");
+          infoDiv.className = "track-info";
+          const duration = formatDuration(track.duration);
+          const genreLink = track.genre
+            ? `<a href="https://soundcloud.com/tags/${encodeURIComponent(track.genre)}" target="_blank" style="color:#00bfff;font-size:12px;text-decoration:none;">#${track.genre}</a>`
+            : "Unknown";
+          infoDiv.innerHTML = `
+            <div class="track-title">${track.title || "Unknown Track"}</div>
+            <div class="track-artist">👤 ${track.artist || "Unknown Artist"}</div>
+            <div class="track-meta">
+              🎵 ${genreLink} &nbsp;|&nbsp; ⏱️ ${duration} &nbsp;|&nbsp;
+              <a class="small-link" href="${track.permalink || "#"}" target="_blank">🔗 View</a>
+            </div>
+          `;
+
+          const downloadBtn = document.createElement("button");
+          downloadBtn.className = "download-btn";
+          downloadBtn.textContent = "Download";
+
+          downloadBtn.onclick = async () => {
+            if (!track.streamUrl) return alert("Stream not available.");
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = "⏳ Starting...";
+            try {
+              const response = await fetch(`main-download.php?type=track&url=${encodeURIComponent(track.streamUrl)}&title=${encodeURIComponent(track.title)}`);
+              if (!response.ok) throw new Error("Download failed");
+              const contentLength = response.headers.get("content-length");
+              const total = contentLength ? parseInt(contentLength, 10) : 0;
+              const reader = response.body.getReader();
+              const chunks = [];
+              let received = 0;
+
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                received += value.length;
+
+                if (total) {
+                  const percent = ((received / total) * 100).toFixed(1);
+                  downloadBtn.textContent = `⬇️ ${percent}%`;
+                  downloadBtn.style.background = `linear-gradient(to right, #218838 ${percent}%, #28a745 ${percent}%)`;
+                } else {
+                  downloadBtn.textContent = `⬇️ ${Math.round(received / 1024)} KB`;
+                }
+              }
+
+              const blob = new Blob(chunks, { type: "audio/mpeg" });
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              link.download = sanitizeFilename(track.title || "track") + ".mp3";
+              link.click();
+
+              downloadBtn.textContent = "✅ Done";
+            } catch (err) {
+              console.error(err);
+              downloadBtn.textContent = "❌ Error";
+            } finally {
+              setTimeout(() => {
+                downloadBtn.disabled = false;
+                downloadBtn.textContent = "Download";
+                downloadBtn.style.background = "#28a745";
+              }, 2000);
+            }
+          };
+
+          trackDiv.appendChild(img);
+          trackDiv.appendChild(infoDiv);
+          trackDiv.appendChild(downloadBtn);
+          tracksDiv.appendChild(trackDiv);
+        });
+      } catch (err) {
+        console.error(err);
+        tracksDiv.innerHTML = "<p>⚠️ Error fetching tracks.</p>";
+      }
+    });
+
+    // Download full playlist (SSE with visual list)
+    downloadAllBtn.addEventListener("click", async () => {
+        if (!playlistData) return;
+
+        // --- Progress UI ---
+        const progressContainer = document.createElement("div");
+        progressContainer.style.margin = "15px 0";
+        progressContainer.style.padding = "10px";
+        progressContainer.style.background = "#1b1b1b";
+        progressContainer.style.borderRadius = "10px";
+        progressContainer.innerHTML = "<h3 style='color:#ffa500;margin-top:0;'>⬇️ Download Progress</h3>";
+        tracksDiv.prepend(progressContainer);
+
+        const trackList = document.createElement("ul");
+        trackList.style.listStyle = "none";
+        trackList.style.padding = "0";
+
+        playlistData.tracks.forEach(track => {
+            const li = document.createElement("li");
+            li.style.color = "#bbb";
+            li.dataset.title = track.title;
+            li.innerHTML = `🔘 <span class="track-name">${track.title}</span> - <span class="progress">0%</span>`;
+            trackList.appendChild(li);
+        });
+        progressContainer.appendChild(trackList);
+
+        const playlistTitle = playlistData.title;
+
+        // --- SSE Connection for progress ---
+        const evtSource = new EventSource(`playlist-progress.php?title=${playlistTitle}`);
+        evtSource.onmessage = e => {
+            if (!e.data) return;
+            const msg = JSON.parse(e.data);
+            console.log("msg ----> ", msg);
+
+            if (msg.track && msg.track !== "done") {
+                const li = Array.from(trackList.children).find(el => el.dataset.title === msg.track);
+                if (li) {
+                    li.style.color = "#ffa500";
+                    li.querySelector(".progress").textContent = msg.percent ? `${msg.percent}%` : `Downloading...`;
+                }
+            }
+
+            // When all tracks are done
+            if (msg.track === "done") {
+                evtSource.close();
+                progressContainer.querySelector("h3").textContent = "✅ Playlist ready for download!";
+
+                // --- Create Download Button ---
+                const downloadBtn = document.createElement("button");
+                downloadBtn.textContent = "⬇️ Download ZIP";
+                downloadBtn.style.background = "#ffa500";
+                downloadBtn.style.color = "#000";
+                downloadBtn.style.border = "none";
+                downloadBtn.style.padding = "10px 20px";
+                downloadBtn.style.borderRadius = "8px";
+                downloadBtn.style.cursor = "pointer";
+                downloadBtn.style.marginTop = "10px";
+                downloadBtn.style.fontWeight = "bold";
+
+                downloadBtn.addEventListener("click", async () => {
+                    const res = await fetch(`download-playlist.php?file=${msg.zip}`);
+                    const blob = await res.blob();
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = msg.zip;
+                    link.click();
+                    downloadBtn.textContent = "✅ Downloaded!";
+                    downloadBtn.disabled = true;
+                    downloadBtn.style.opacity = "0.7";
+                });
+
+                progressContainer.appendChild(downloadBtn);
+            }
+        };
+
+        evtSource.onerror = () => {
+            console.warn("SSE connection lost.");
+            evtSource.close();
+        };
+
+        // --- Trigger backend playlist preparation ---
+        await fetch("prepare-playlist.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: playlistData })
+        });
+    });
+
+
+    // --- Add new button for individual track downloads ---
+    downloadAllIndividuallyBtn.addEventListener("click", async () => {
+      if (!playlistData) return;
+
+      downloadAllIndividuallyBtn.disabled = true;
+      downloadAllIndividuallyBtn.textContent = "⏳ Downloading all tracks...";
+
+      // --- UI: progress container ---
+      const progressContainer = document.createElement("div");
+      progressContainer.style.margin = "15px 0";
+      progressContainer.style.padding = "10px";
+      progressContainer.style.background = "#1b1b1b";
+      progressContainer.style.borderRadius = "10px";
+      progressContainer.innerHTML = "<h3 style='color:#ffa500;'>⬇️ Downloading tracks...</h3>";
+      tracksDiv.prepend(progressContainer);
+
+      // Track list
+      const list = document.createElement("ul");
+      list.style.listStyle = "none";
+      list.style.padding = "0";
+      playlistData.tracks.forEach(t => {
+        const li = document.createElement("li");
+        li.style.color = "#bbb";
+        li.style.marginBottom = "5px";
+        li.innerHTML = `🔘 <span>${t.title}</span> - <span class="progress">0%</span>`;
+        list.appendChild(li);
+      });
+      progressContainer.appendChild(list);
+
+      // --- Sequentially download each track ---
+      let errorFound = false;
+      for (let i = 0; i < playlistData.tracks.length; i++) {
+        const track = playlistData.tracks[i];
+        const li = list.children[i];
+
+        try {
+          li.querySelector(".progress").textContent = "⏳ Starting...";
+          progressContainer.querySelector("h3").textContent =
+            `⬇️ Downloading: ${track.title} - ${i + 1}/${playlistData.tracks.length} - 0%`;
+
+          const response = await fetch(`main-download.php?type=track&url=${encodeURIComponent(track.streamUrl)}&title=${encodeURIComponent(track.title)}`);
+          if (!response.ok) throw new Error("Download failed");
+
+          const reader = response.body.getReader();
+          const contentLength = response.headers.get("content-length");
+          const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+          const chunks = [];
+          let received = 0;
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received += value.length;
+
+            // --- update progress ---
+            let percent = totalBytes ? ((received / totalBytes) * 100).toFixed(1) : Math.round(received / 1024);
+            li.querySelector(".progress").textContent = totalBytes ? `${percent}%` : `${percent} KB`;
+            progressContainer.querySelector("h3").textContent =
+              `⬇️ Downloading: ${track.title} - ${i + 1}/${playlistData.tracks.length} - ${percent}%`;
+          }
+
+          const blob = new Blob(chunks, { type: "audio/mpeg" });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = sanitizeFilename(track.title || `track_${i}`) + ".mp3";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+
+          li.innerHTML = `✅ <s>${track.title}</s> - 100%`;
+          li.style.color = "#0f0";
+
+        } catch (err) {
+          console.error(`Failed to download ${track.title}:`, err);
+          li.innerHTML = `❌ ${track.title} - Error`;
+          li.style.color = "#f00";
+          errorFound = true;
+        }
+      }
+
+      if(errorFound){
+        progressContainer.querySelector("h3").textContent = "❌ Downloading Completed with Errors.";
+      }else{
+        progressContainer.querySelector("h3").textContent = "✅ All tracks downloaded!";
+      }
+
+
+      downloadAllIndividuallyBtn.disabled = false;
+      downloadAllIndividuallyBtn.textContent = "⬇️ Download Playlist";
+    });
+
+
+    async function downloadImage(url, filename) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return alert("Failed to fetch image.");
+        const blob = await res.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      } catch (err) {
+        console.error("downloadImage error:", err);
+        alert("Download failed.");
+      }
+    }
+
+    downloadCoverBtn.addEventListener("click", async () => {
+      if (!playlistData?.artwork) return;
+      await downloadImage(playlistData.artwork, sanitizeFilename(`${playlistData.title || "cover"}.jpg`));
+    });
+
+    downloadProfileBtn.addEventListener("click", async () => {
+      if (!playlistData?.profilePic) return;
+      await downloadImage(playlistData.profilePic, sanitizeFilename(`${playlistData.author || "profile"}.jpg`));
+    });
+
+    resetBtn.addEventListener("click", () => {
+      location.reload(); // Refreshes the page completely
+    });
+
+    function sanitizeFilename(name) {
+      return name.replace(/[\\/:*?"<>|]/g, "_");
+    }
+  </script>
+</body>
+</html>
