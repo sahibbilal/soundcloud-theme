@@ -1,4 +1,4 @@
-name: Deploy to Rewamp-Dev
+name: Deploy to Dev
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
       #     npm run build
 
       - name: Deploy via FTP (Dev)
-        if: ${{ vars.FTP_SERVER_DEV }}
+        if: ${{ vars.FTP_SERVER }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ vars.FTP_SERVER }}
