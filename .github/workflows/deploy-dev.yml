@@ -1,0 +1,49 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dev-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy dev site
+    runs-on: ubuntu-latest
+    environment: soundcloud-dev-env
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Add build steps here if needed (e.g., npm ci && npm run build)
+      # - name: Build
+      #   run: |
+      #     npm ci
+      #     npm run build
+
+      - name: Deploy via FTP (Dev)
+        if: ${{ vars.FTP_SERVER }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ vars.FTP_SERVER }}
+          username: ${{ vars.FTP_USERNAME }}
+          password: ${{ vars.FTP_PASSWORD }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: ${{ vars.FTP_LOCAL_DIR_DEV || './' }}
+          server-dir: ${{ vars.FTP_REMOTE_DIR_DEV || '/' }}
+          state-name: .ftp-deploy-dev-state.json
+          dangerous-clean-slate: true
+          exclude: |
+            .git/**
+            .github/**
+            node_modules/**
+            **/.git*
+            **/.DS_Store
+
