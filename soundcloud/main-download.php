@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit(0); // CORS preflight
 set_time_limit(0);
 ignore_user_abort(true);
 
-$CLIENT_ID = "LAd42S06rwW6N9SO85p7573ak7rH6lMf"; // SoundCloud client id
+$CLIENT_ID = "MaZ7bR62GvbulJgV8EUjQnHfbZGDEKaI"; // SoundCloud client id
 
 /* ---------- Helpers ---------- */
 function resolveRedirect($url) {
