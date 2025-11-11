@@ -18,7 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
 set_time_limit(0);
 ignore_user_abort(true);
 
-$CLIENT_ID = "LAd42S06rwW6N9SO85p7573ak7rH6lMf";
+// Load WordPress to access theme options (this file is called directly via AJAX)
+if (!defined('ABSPATH')) {
+    $wp_load = dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php';
+    if (file_exists($wp_load)) {
+        require_once $wp_load;
+    }
+}
+
+// Get CLIENT_ID from theme options
+if (defined('ABSPATH') && function_exists('sound_cloud_theme_get_client_id')) {
+    $CLIENT_ID = sound_cloud_theme_get_client_id();
+}
 
 function safeFilename($name){
     return preg_replace('/[^a-zA-Z0-9\-]/', '_', trim($name));

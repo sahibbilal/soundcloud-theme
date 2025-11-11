@@ -364,6 +364,211 @@ add_action('admin_menu', 'sound_cloud_theme_admin_menu');
 require_once get_template_directory() . '/inc/meta-boxes.php';
 
 /**
+ * Add duplicate functionality for pages and posts
+ */
+function sound_cloud_theme_duplicate_post_link($actions, $post) {
+    if (current_user_can('edit_posts')) {
+        $post_type = get_post_type($post);
+        if (in_array($post_type, array('post', 'page'))) {
+            $duplicate_url = wp_nonce_url(
+                admin_url('admin.php?action=duplicate_post&post=' . $post->ID),
+                'duplicate_post_' . $post->ID,
+                'duplicate_nonce'
+            );
+            $actions['duplicate'] = '<a href="' . esc_url($duplicate_url) . '" title="' . esc_attr__('Duplicate this item', 'sound-cloud-theme') . '">' . __('Duplicate', 'sound-cloud-theme') . '</a>';
+        }
+    }
+    return $actions;
+}
+add_filter('post_row_actions', 'sound_cloud_theme_duplicate_post_link', 10, 2);
+add_filter('page_row_actions', 'sound_cloud_theme_duplicate_post_link', 10, 2);
+
+/**
+ * Handle duplicate post action
+ */
+function sound_cloud_theme_duplicate_post() {
+    if (!isset($_GET['post']) || !isset($_GET['action']) || $_GET['action'] !== 'duplicate_post') {
+        return;
+    }
+    
+    if (!isset($_GET['duplicate_nonce']) || !wp_verify_nonce($_GET['duplicate_nonce'], 'duplicate_post_' . $_GET['post'])) {
+        wp_die(__('Security check failed', 'sound-cloud-theme'));
+    }
+    
+    if (!current_user_can('edit_posts')) {
+        wp_die(__('You do not have permission to duplicate posts', 'sound-cloud-theme'));
+    }
+    
+    $post_id = absint($_GET['post']);
+    $post = get_post($post_id);
+    
+    if (!$post) {
+        wp_die(__('Post not found', 'sound-cloud-theme'));
+    }
+    
+    // Create duplicate
+    $new_post = array(
+        'post_title' => $post->post_title . ' (Copy)',
+        'post_content' => $post->post_content,
+        'post_excerpt' => $post->post_excerpt,
+        'post_status' => 'draft',
+        'post_type' => $post->post_type,
+        'post_author' => get_current_user_id(),
+        'post_date' => current_time('mysql'),
+        'post_date_gmt' => current_time('mysql', 1),
+    );
+    
+    $new_post_id = wp_insert_post($new_post);
+    
+    if ($new_post_id) {
+        // Copy post meta
+        $meta_keys = get_post_custom_keys($post_id);
+        if ($meta_keys) {
+            foreach ($meta_keys as $meta_key) {
+                $meta_values = get_post_custom_values($meta_key, $post_id);
+                foreach ($meta_values as $meta_value) {
+                    add_post_meta($new_post_id, $meta_key, $meta_value);
+                }
+            }
+        }
+        
+        // Copy taxonomies
+        $taxonomies = get_object_taxonomies($post->post_type);
+        if ($taxonomies) {
+            foreach ($taxonomies as $taxonomy) {
+                $terms = wp_get_object_terms($post_id, $taxonomy, array('fields' => 'slugs'));
+                if ($terms && !is_wp_error($terms)) {
+                    wp_set_object_terms($new_post_id, $terms, $taxonomy);
+                }
+            }
+        }
+        
+        // Copy featured image
+        $thumbnail_id = get_post_thumbnail_id($post_id);
+        if ($thumbnail_id) {
+            set_post_thumbnail($new_post_id, $thumbnail_id);
+        }
+        
+        // Copy page template if it's a page
+        if ($post->post_type === 'page') {
+            $page_template = get_page_template_slug($post_id);
+            if ($page_template) {
+                update_post_meta($new_post_id, '_wp_page_template', $page_template);
+            }
+        }
+        
+        wp_redirect(admin_url('edit.php?post_type=' . $post->post_type . '&duplicated=1'));
+        exit;
+    } else {
+        wp_die(__('Failed to duplicate post', 'sound-cloud-theme'));
+    }
+}
+add_action('admin_action_duplicate_post', 'sound_cloud_theme_duplicate_post');
+
+/**
+ * Show admin notice after duplication
+ */
+function sound_cloud_theme_duplicate_notice() {
+    if (isset($_GET['duplicated']) && $_GET['duplicated'] == '1') {
+        echo '<div class="notice notice-success is-dismissible"><p>' . __('Post duplicated successfully!', 'sound-cloud-theme') . '</p></div>';
+    }
+}
+add_action('admin_notices', 'sound_cloud_theme_duplicate_notice');
+
+/**
+ * Add theme options page for CLIENT_ID
+ */
+function sound_cloud_theme_options_menu() {
+    add_theme_page(
+        __('SoundCloud Settings', 'sound-cloud-theme'),
+        __('SoundCloud Settings', 'sound-cloud-theme'),
+        'manage_options',
+        'sound-cloud-theme-settings',
+        'sound_cloud_theme_options_page'
+    );
+}
+add_action('admin_menu', 'sound_cloud_theme_options_menu');
+
+/**
+ * Register theme options settings
+ */
+function sound_cloud_theme_register_settings() {
+    register_setting('sound_cloud_theme_options', 'sound_cloud_client_id', array(
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_text_field',
+        'default' => 'LAd42S06rwW6N9SO85p7573ak7rH6lMf'
+    ));
+}
+add_action('admin_init', 'sound_cloud_theme_register_settings');
+
+/**
+ * Theme options page callback
+ */
+function sound_cloud_theme_options_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.', 'sound-cloud-theme'));
+    }
+    
+    if (isset($_POST['submit']) && check_admin_referer('sound_cloud_theme_options_update')) {
+        $client_id = sanitize_text_field($_POST['sound_cloud_client_id']);
+        update_option('sound_cloud_client_id', $client_id);
+        echo '<div class="notice notice-success"><p>' . __('Settings saved!', 'sound-cloud-theme') . '</p></div>';
+    }
+    
+    $client_id = get_option('sound_cloud_client_id', 'LAd42S06rwW6N9SO85p7573ak7rH6lMf');
+    ?>
+    <div class="wrap">
+        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+        
+        <form method="post" action="">
+            <?php wp_nonce_field('sound_cloud_theme_options_update'); ?>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="sound_cloud_client_id"><?php _e('SoundCloud Client ID', 'sound-cloud-theme'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" 
+                               id="sound_cloud_client_id" 
+                               name="sound_cloud_client_id" 
+                               value="<?php echo esc_attr($client_id); ?>" 
+                               class="regular-text" 
+                               placeholder="Enter your SoundCloud Client ID" />
+                        <p class="description">
+                            <?php _e('Enter your SoundCloud API Client ID. This is used to fetch track information from SoundCloud.', 'sound-cloud-theme'); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            
+            <?php submit_button(); ?>
+        </form>
+        
+        <div class="card" style="max-width: 800px; margin-top: 20px;">
+            <h2><?php _e('How to get a SoundCloud Client ID', 'sound-cloud-theme'); ?></h2>
+            <ol>
+                <li><?php _e('Go to', 'sound-cloud-theme'); ?> <a href="https://developers.soundcloud.com/" target="_blank">https://developers.soundcloud.com/</a></li>
+                <li><?php _e('Sign in with your SoundCloud account', 'sound-cloud-theme'); ?></li>
+                <li><?php _e('Click "Register a new application"', 'sound-cloud-theme'); ?></li>
+                <li><?php _e('Fill in the application details and submit', 'sound-cloud-theme'); ?></li>
+                <li><?php _e('Copy the Client ID from your application dashboard', 'sound-cloud-theme'); ?></li>
+                <li><?php _e('Paste it in the field above and save', 'sound-cloud-theme'); ?></li>
+            </ol>
+        </div>
+    </div>
+    <?php
+}
+
+/**
+ * Get SoundCloud Client ID from theme options
+ */
+function sound_cloud_theme_get_client_id() {
+    $client_id = get_option('sound_cloud_client_id', 'LAd42S06rwW6N9SO85p7573ak7rH6lMf');
+    return apply_filters('sound_cloud_theme_client_id', $client_id);
+}
+
+/**
  * Theme data management page
  */
 function sound_cloud_theme_data_page() {
