@@ -18,17 +18,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
 set_time_limit(0);
 ignore_user_abort(true);
 
-// Load WordPress to access theme options (this file is called directly via AJAX)
-if (!defined('ABSPATH')) {
-    $wp_load = dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php';
-    if (file_exists($wp_load)) {
-        require_once $wp_load;
+// Get CLIENT_ID from WordPress REST API
+function getClientIdFromAPI() {
+    // Detect WordPress site URL from current request
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    
+    // Extract base path (remove /wp-content/themes/sound-cloud-theme/soundcloud/prepare-playlist.php)
+    $basePath = str_replace('/wp-content/themes/sound-cloud-theme/soundcloud/prepare-playlist.php', '', $script);
+    $basePath = str_replace('/soundcloud/prepare-playlist.php', '', $basePath);
+    $basePath = rtrim($basePath, '/');
+    
+    $apiUrl = $protocol . $host . $basePath . '/wp-json/soundcloud/v1/client-id';
+    
+    $ch = curl_init($apiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_TIMEOUT => 5,
+        CURLOPT_USERAGENT => "Mozilla/5.0"
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200 && $response) {
+        $data = json_decode($response, true);
+        if (isset($data['client_id']) && !empty($data['client_id'])) {
+            return $data['client_id'];
+        }
     }
+    
+    // Return null if API fails or CLIENT_ID is not set
+    return null;
 }
 
-// Get CLIENT_ID from theme options
-if (defined('ABSPATH') && function_exists('sound_cloud_theme_get_client_id')) {
-    $CLIENT_ID = sound_cloud_theme_get_client_id();
+$CLIENT_ID = getClientIdFromAPI();
+
+// Validate CLIENT_ID
+if (empty($CLIENT_ID)) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(["error" => "SoundCloud Client ID is not configured. Please set it in WordPress admin: Appearance → SoundCloud Settings"]);
+    exit;
 }
 
 function safeFilename($name){
