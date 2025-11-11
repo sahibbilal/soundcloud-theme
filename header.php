@@ -60,38 +60,7 @@
                         echo '</ul>';
                     }
                     ?>
-                    
-                    <div class="header-actions">
-                        <button class="search-toggle" aria-label="Search">
-                            <span class="search-icon">🔍</span>
-                        </button>
-                    </div>
                 </nav>
-                
-                <!-- Search Popup -->
-                <div id="search-popup" class="search-popup">
-                    <div class="search-popup-content">
-                        <div class="search-popup-header">
-                            <h3>Search</h3>
-                            <button class="search-close" aria-label="Close search">
-                                <span>×</span>
-                            </button>
-                        </div>
-                        <div class="search-popup-body">
-                            <?php get_search_form(); ?>
-                            <div class="search-suggestions">
-                                <h4>Popular Searches</h4>
-                                <div class="search-tags">
-                                    <span class="search-tag">SoundCloud</span>
-                                    <span class="search-tag">Download</span>
-                                    <span class="search-tag">Music</span>
-                                    <span class="search-tag">MP3</span>
-                                    <span class="search-tag">Audio</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </header>
