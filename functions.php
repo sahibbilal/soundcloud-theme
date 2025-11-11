@@ -29,6 +29,7 @@ function sound_cloud_theme_setup() {
     
     // Register navigation menus
     register_nav_menus(array(
+        'top_bar' => __('Top Bar Menu', 'sound-cloud-theme'),
         'primary' => __('Primary Menu', 'sound-cloud-theme'),
         'footer_quick' => __('Footer Quick Links', 'sound-cloud-theme'),
         'footer_legal' => __('Footer Legal', 'sound-cloud-theme'),
@@ -664,10 +665,8 @@ function sound_cloud_theme_data_page() {
 function sound_cloud_theme_shortcode_downloader() {
     ob_start();
     ?>
-    <div class="scdl-container" style="font-family: Arial, sans-serif; background-color: #111; color: #eee; margin: 0; padding: 15px;">
+    <div class="scdl-container" style="font-family: Arial, sans-serif;padding: 15px;">
         <div class="container" style="max-width: 1000px; margin: auto; word-wrap: break-word;">
-            <h1 style="text-align:center;margin-bottom:20px;color:#ffa500;font-size:clamp(20px,5vw,36px);">🎵 SoundCloud Downloader</h1>
-
             <div class="input-section" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:20px;">
                 <input type="text" id="scdlUrlInput" placeholder="Enter SoundCloud playlist or track URL" style="flex:1;padding:10px;border-radius:5px;border:none;font-size:16px;width:100%;box-sizing:border-box;" />
                 <button id="scdlFetchBtn" style="background-color:#f60;border:none;color:#fff;padding:10px 15px;border-radius:5px;font-size:16px;cursor:pointer;">Download</button>

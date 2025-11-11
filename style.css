@@ -36,6 +36,44 @@ body.popup-open {
     padding: 0 20px;
 }
 
+/* Top Bar Styles */
+.top-bar {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 0.5rem 0;
+}
+
+.top-bar-navigation {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.top-bar-menu {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar-menu li {
+    margin: 0;
+}
+
+.top-bar-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    padding: 0.25rem 0;
+}
+
+.top-bar-menu a:hover {
+    color: #f0f0f0;
+}
+
 /* Header Styles */
 .site-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
