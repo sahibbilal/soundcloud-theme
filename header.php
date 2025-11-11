@@ -49,15 +49,6 @@
                             'menu_class' => 'nav-menu',
                             'container' => false,
                         ));
-                    } else {
-                        // Fallback: list top-level pages so new pages appear automatically
-                        echo '<ul id="primary-menu" class="nav-menu">';
-                        wp_list_pages(array(
-                            'title_li' => '',
-                            'depth' => 1,
-                            'sort_column' => 'menu_order,post_title'
-                        ));
-                        echo '</ul>';
                     }
                     ?>
                 </nav>
