@@ -14,6 +14,23 @@
 
 <div id="page" class="site">
     <header id="masthead" class="site-header">
+        <div class="top-bar">
+            <div class="container">
+                <nav class="top-bar-navigation">
+                    <?php
+                    if (has_nav_menu('top_bar')) {
+                        wp_nav_menu(array(
+                            'theme_location' => 'top_bar',
+                            'menu_id' => 'top-bar-menu',
+                            'menu_class' => 'top-bar-menu',
+                            'container' => false,
+                            'depth' => 1,
+                        ));
+                    }
+                    ?>
+                </nav>
+            </div>
+        </div>
         <div class="container">
             <div class="header-content">
                 <div class="site-branding">
