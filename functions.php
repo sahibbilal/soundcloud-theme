@@ -495,8 +495,7 @@ add_action('admin_menu', 'sound_cloud_theme_options_menu');
 function sound_cloud_theme_register_settings() {
     register_setting('sound_cloud_theme_options', 'sound_cloud_client_id', array(
         'type' => 'string',
-        'sanitize_callback' => 'sanitize_text_field',
-        'default' => 'LAd42S06rwW6N9SO85p7573ak7rH6lMf'
+        'sanitize_callback' => 'sanitize_text_field'
     ));
 }
 add_action('admin_init', 'sound_cloud_theme_register_settings');
@@ -515,7 +514,7 @@ function sound_cloud_theme_options_page() {
         echo '<div class="notice notice-success"><p>' . __('Settings saved!', 'sound-cloud-theme') . '</p></div>';
     }
     
-    $client_id = get_option('sound_cloud_client_id', 'LAd42S06rwW6N9SO85p7573ak7rH6lMf');
+    $client_id = get_option('sound_cloud_client_id', '');
     ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
@@ -564,8 +563,31 @@ function sound_cloud_theme_options_page() {
  * Get SoundCloud Client ID from theme options
  */
 function sound_cloud_theme_get_client_id() {
-    $client_id = get_option('sound_cloud_client_id', 'LAd42S06rwW6N9SO85p7573ak7rH6lMf');
+    $client_id = get_option('sound_cloud_client_id', '');
     return apply_filters('sound_cloud_theme_client_id', $client_id);
+}
+
+/**
+ * Register REST API endpoint for SoundCloud Client ID
+ */
+function sound_cloud_theme_register_rest_api() {
+    register_rest_route('soundcloud/v1', '/client-id', array(
+        'methods' => 'GET',
+        'callback' => 'sound_cloud_theme_rest_get_client_id',
+        'permission_callback' => '__return_true', // Public endpoint
+    ));
+}
+add_action('rest_api_init', 'sound_cloud_theme_register_rest_api');
+
+/**
+ * REST API callback to get Client ID
+ */
+function sound_cloud_theme_rest_get_client_id() {
+    $client_id = sound_cloud_theme_get_client_id();
+    return new WP_REST_Response(array(
+        'client_id' => $client_id,
+        'success' => true
+    ), 200);
 }
 
 /**
