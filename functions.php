@@ -27,6 +27,9 @@ function sound_cloud_theme_setup() {
     add_theme_support('custom-logo');
     add_theme_support('customize-selective-refresh-widgets');
     
+    // Add explicit menu support
+    add_theme_support('menus');
+    
     // Register navigation menus
     register_nav_menus(array(
         'top_bar' => __('Top Bar Menu', 'sound-cloud-theme'),
