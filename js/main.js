@@ -16,29 +16,7 @@
             $('.main-navigation').toggleClass('menu-open');
         });
 
-        // Search popup toggle
-        $('.search-toggle').on('click', function() {
-            $('#search-popup').addClass('active');
-            $('body').addClass('popup-open');
-            setTimeout(function() {
-                $('.search-popup .search-field').focus();
-            }, 300);
-        });
-
-        // Close search popup
-        $('.search-close, #search-popup').on('click', function(e) {
-            if (e.target === this) {
-                $('#search-popup').removeClass('active');
-                $('body').removeClass('popup-open');
-            }
-        });
-
-        // Search tag functionality
-        $('.search-tag').on('click', function() {
-            var tagText = $(this).text();
-            $('.search-popup .search-field').val(tagText);
-            $('.search-popup .search-field').focus();
-        });
+        // Search popup functionality - REMOVED (saved in inc/saved-search-functionality.php)
 
         // Smooth scrolling for anchor links
         $('a[href*="#"]:not([href="#"])').click(function() {
