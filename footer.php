@@ -18,10 +18,6 @@
                             'menu_class' => '',
                             'fallback_cb' => false,
                         ));
-                    } else {
-                        echo '<ul>';
-                        wp_list_pages(array('title_li' => '', 'depth' => 1));
-                        echo '</ul>';
                     } ?>
                 </div>
                 
@@ -34,12 +30,6 @@
                             'menu_class' => '',
                             'fallback_cb' => false,
                         ));
-                    } else {
-                        echo '<ul>';
-                        echo '<li><a href="' . esc_url(home_url('/privacy-policy/')) . '">Privacy Policy</a></li>';
-                        echo '<li><a href="' . esc_url(home_url('/terms-of-service/')) . '">Terms of Service</a></li>';
-                        echo '<li><a href="' . esc_url(home_url('/dmca/')) . '">DMCA</a></li>';
-                        echo '</ul>';
                     } ?>
                 </div>
                 
@@ -52,12 +42,6 @@
                             'menu_class' => '',
                             'fallback_cb' => false,
                         ));
-                    } else {
-                        echo '<ul>';
-                        echo '<li><a href="' . esc_url(home_url('/help/')) . '">Help Center</a></li>';
-                        echo '<li><a href="' . esc_url(home_url('/faq/')) . '">FAQ</a></li>';
-                        echo '<li><a href="' . esc_url(home_url('/contact/')) . '">Contact Support</a></li>';
-                        echo '</ul>';
                     } ?>
                 </div>
             </div>
@@ -72,13 +56,7 @@
                         'fallback_cb' => false,
                         'depth' => 1,
                     ));
-                } else {
-                    echo '<p><a href="' . esc_url(home_url('/privacy-policy/')) . '">Privacy Policy</a> | <a href="' . esc_url(home_url('/terms-of-service/')) . '">Terms of Service</a></p>';
                 } ?>
-                <p class="disclaimer">
-                    <strong>Disclaimer:</strong> This service is for educational purposes only. 
-                    Please respect copyright laws and only download content you have permission to use.
-                </p>
             </div>
         </div>
     </footer>
