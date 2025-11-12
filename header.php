@@ -14,13 +14,11 @@
 
 <div id="page" class="site">
     <header id="masthead" class="site-header">
-        
-        <?php
-        if (has_nav_menu('top_bar')) {?>
-            <div class="top-bar">
-                <div class="container">
-                    <nav class="top-bar-navigation">
-                        <?php
+        <div class="top-bar">
+            <div class="container">
+                <nav class="top-bar-navigation">
+                    <?php
+                    if (has_nav_menu('top_bar')) {
                         wp_nav_menu(array(
                             'theme_location' => 'top_bar',
                             'menu_id' => 'top-bar-menu',
@@ -28,12 +26,11 @@
                             'container' => false,
                             'depth' => 1,
                         ));
-                        ?>
-                    </nav>
-                </div>
+                    }
+                    ?>
+                </nav>
             </div>
-        <?php
-        }?>
+        </div>
         <div class="container">
             <div class="header-content">
                 <div class="site-branding">
