@@ -57,11 +57,11 @@
         data.tracks.forEach(track => {
           const wrap = document.createElement('div'); wrap.className='track'; wrap.style.cssText='display:flex;align-items:center;justify-content:space-between;background:#222;padding:10px;border-radius:10px;margin-bottom:10px;gap:10px;flex-wrap:wrap;';
           const img = document.createElement('img'); img.src = track.artwork || fallbackImg; img.onerror=()=>img.src=fallbackImg; img.style.cssText='width:65px;height:65px;border-radius:8px;object-fit:cover;background:#333;flex-shrink:0;';
-          const info = document.createElement('div'); info.className='track-info'; info.style.cssText='flex:1;overflow:hidden;min-width:200px;text-align:left;';
+          const info = document.createElement('div'); info.className='track-info'; info.style.cssText='flex:1;overflow:hidden;min-width:200px;';
           const duration = formatDuration(track.duration);
           const genreLink = track.genre ? `<a href="https://soundcloud.com/tags/${encodeURIComponent(track.genre)}" target="_blank" style="color:#00bfff;font-size:12px;text-decoration:none;">#${track.genre}</a>` : 'Unknown';
           info.innerHTML = `<div style="font-size:15px;font-weight:500;word-break:break-word;">${track.title||'Unknown Track'}</div>
-                            <div style="font-size:13px;color:#fff;">👤 ${track.artist||'Unknown Artist'}</div>
+                            <div style="font-size:13px;color:#bbb;">👤 ${track.artist||'Unknown Artist'}</div>
                             <div style="font-size:12px;color:#aaa;margin-top:6px;">🎵 ${genreLink} &nbsp;|&nbsp; ⏱️ ${duration} &nbsp;|&nbsp; <a style=\"color:#ffa500;text-decoration:none;\" href=\"${track.permalink||'#'}\" target=\"_blank\">🔗 View</a></div>`;
           const btn = document.createElement('button'); btn.textContent='Download'; btn.style.cssText='background:#28a745;color:#fff;border:none;border-radius:5px;padding:8px 12px;cursor:pointer;flex-shrink:0;position:relative;overflow:hidden;width:100%;max-width:140px;text-align:center;';
           btn.onclick = async () => {
@@ -88,7 +88,7 @@
       const progress = document.createElement('div'); progress.style.cssText='margin:15px 0;padding:10px;background:#1b1b1b;border-radius:10px;';
       progress.innerHTML = "<h3 style='color:#ffa500;margin-top:0;'>⬇️ Download Progress</h3>"; tracksDiv.prepend(progress);
       const list = document.createElement('ul'); list.style.listStyle='none'; list.style.padding='0';
-      playlistData.tracks.forEach(t=>{ const li=document.createElement('li'); li.style.color='#fff'; li.dataset.title=t.title; li.innerHTML=`🔘 <span class=\"track-name\">${t.title}</span> - <span class=\"progress\">0%</span>`; list.appendChild(li); });
+      playlistData.tracks.forEach(t=>{ const li=document.createElement('li'); li.style.color='#bbb'; li.dataset.title=t.title; li.innerHTML=`🔘 <span class=\"track-name\">${t.title}</span> - <span class=\"progress\">0%</span>`; list.appendChild(li); });
       progress.appendChild(list);
       const evt = new EventSource(BASE + `/playlist-progress.php?title=${encodeURIComponent(playlistData.title)}`);
       evt.onmessage = (ev)=>{ if(!ev.data) return; const msg = JSON.parse(ev.data); if(msg.track && msg.track!=='done'){ const li = Array.from(list.children).find(el=>el.dataset.title===msg.track); if(li){ li.style.color='#ffa500'; li.querySelector('.progress').textContent = msg.percent? `${msg.percent}%` : 'Downloading...'; } } if(msg.track==='done'){ evt.close(); progress.querySelector('h3').textContent = '✅ Playlist ready for download!'; const db=document.createElement('button'); db.textContent='⬇️ Download ZIP'; db.style.cssText='background:#ffa500;color:#000;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:bold;'; db.addEventListener('click', async ()=>{ const res = await fetch(BASE + `/download-playlist.php?file=${msg.zip}`); const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=msg.zip; a.click(); db.textContent='✅ Downloaded!'; db.disabled=true; db.style.opacity='0.7'; }); progress.appendChild(db); } };

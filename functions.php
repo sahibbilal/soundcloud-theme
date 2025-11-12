@@ -669,19 +669,18 @@ function sound_cloud_theme_shortcode_downloader() {
     ob_start();
     ?>
     <div class="scdl-container" style="font-family: Arial, sans-serif;padding: 15px;">
-        <div class="container" style="max-width: 1000px;margin: auto;word-wrap: break-word;background: black;padding: 20px;border-radius: 15px;">
+        <div class="container" style="max-width: 1000px; margin: auto; word-wrap: break-word;">
+            <div class="input-section" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:20px;">
                 <input type="text" id="scdlUrlInput" placeholder="Enter SoundCloud playlist or track URL" style="flex:1;padding:10px;border-radius:5px;border:none;font-size:16px;width:100%;box-sizing:border-box;" />
                 <button id="scdlFetchBtn" style="background-color:#f60;border:none;color:#fff;padding:10px 15px;border-radius:5px;font-size:16px;cursor:pointer;">Download</button>
             </div>
 
-            <div id="scdlPlaylistInfo" style="display:none;padding:15px;border-radius:10px;margin-bottom:15px;align-items:center;gap:15px;flex-wrap:wrap;">
+            <div id="scdlPlaylistInfo" style="display:none;background:#222;padding:15px;border-radius:10px;margin-bottom:15px;align-items:center;gap:15px;flex-wrap:wrap;">
                 <img id="scdlPlaylistArtwork" src="" alt="Artwork" style="width:90px;height:90px;border-radius:10px;object-fit:cover;background:#333;flex-shrink:0;" />
                 <div id="scdlPlaylistDetails" style="flex:1;min-width:200px;">
-                    <h2 id="scdlPlaylistTitle" style="margin:0 0 5px 0;font-size:clamp(16px,4vw,24px);"></h2>
-                    <div class="scdlPlaylistAuthor-wrapper;text-aligh:left;">
-                        <p id="scdlPlaylistAuthor" style="margin:2px 0;color:#bbb;font-size:14px;">Author: </p>
-                        <p id="scdlPlaylistCount" style="margin:2px 0;color:#bbb;font-size:14px;">Count: </p>
-                    </div>
+                    <h2 id="scdlPlaylistTitle" style="margin:0 0 5px 0;font-size:clamp(16px,4vw,24px);color:#ffa500;"></h2>
+                    <p id="scdlPlaylistAuthor" style="margin:2px 0;color:#bbb;font-size:14px;"></p>
+                    <p id="scdlPlaylistCount" style="margin:2px 0;color:#bbb;font-size:14px;"></p>
                 </div>
             </div>
 
