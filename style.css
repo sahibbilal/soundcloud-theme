@@ -421,6 +421,15 @@ body.popup-open {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .top-bar {
+        display: none;
+    }
+    .input-section{
+        flex-direction: column;
+    }
+    .scdl-container .container{
+        padding: 0;
+    }
     .header-content {
         flex-direction: row;
         justify-content: space-between;
