@@ -78,10 +78,8 @@ body.popup-open {
 .site-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-.site-header .container{
     padding: 1rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .header-content {
@@ -423,6 +421,15 @@ body.popup-open {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .top-bar {
+        display: none;
+    }
+    .input-section{
+        flex-direction: column;
+    }
+    .scdl-container .container{
+        padding: 0;
+    }
     .header-content {
         flex-direction: row;
         justify-content: space-between;
